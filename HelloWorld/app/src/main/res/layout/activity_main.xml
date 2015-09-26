@@ -4,7 +4,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
-    android:background="@drawable/ArcticOcean">
+    android:background="@drawable/arctic_ocean">
 
     <TextView
         android:layout_width="wrap_content"
@@ -12,7 +12,7 @@
         android:layout_marginLeft="22dp"
         android:layout_marginTop="28dp"
         android:textColor="#676969"
-        android:typeface="sans"
+        android:fontFamily="sans-serif-medium"
         android:text="120"
         android:textSize="40sp"
         android:id="@+id/stepnumber"/>
@@ -22,8 +22,7 @@
         android:layout_marginLeft="26dp"
         android:layout_below="@+id/stepnumber"
         android:textColor="#676969"
-        android:layout_marginTop="2dp"
-        android:typeface="sans"
+        android:fontFamily="sans-serif-medium"
         android:text="steps"
         android:textSize="26sp"/>
     <TextView
@@ -33,7 +32,7 @@
         android:layout_marginRight="22dp"
         android:textColor="#9A9D9D"
         android:layout_marginTop="40dp"
-        android:typeface="sans"
+        android:fontFamily="sans-serif-medium"
         android:text="Arctic Ocean"
         android:textSize="20sp"/>
 
