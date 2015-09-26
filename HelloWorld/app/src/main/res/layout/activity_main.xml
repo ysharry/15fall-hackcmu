@@ -36,11 +36,16 @@
         android:text="Arctic Ocean"
         android:textSize="20sp"/>
 
-    <Button
+    <android.support.design.widget.FloatingActionButton
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="22dp"
+        android:src="@drawable/ico_bearhead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id = "@+id/friendButton"
-        android:text = "Button"/>
+        android:elevation="6dp"
+        android:backgroundTint = "#00BBD3" />
+
+
 
 
 </RelativeLayout>
