@@ -5,12 +5,15 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.FacebookSdk;
@@ -58,6 +61,28 @@ public class MainActivity extends AppCompatActivity {
     private long LastSync;
 
     private FloatingActionButton mapButton;
+
+    public CityPlans mCityPlans;
+
+    // for number animation
+    private static final int FRAME_TIME_MS = 1;
+    private static final String KEY = "i";
+    private TextView stepCountView;
+    boolean isRunning = false;
+
+    // background updating
+    Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            try {
+                int i= msg.getData().getInt(KEY);
+                stepCountView.setText(String.valueOf(i));
+
+            } catch (Exception err) {
+            }
+        }
+
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,14 +91,13 @@ public class MainActivity extends AppCompatActivity {
 
         initialize();
 
-//        RelativeLayout main = (RelativeLayout) findViewById(R.id.main_frame);
-//        main.setPadding(0,getStatusBarHeight(),0,0);
-
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         int defaultTotalSteps = 0;
         addToStepCount(sharedPref.getInt(getString(R.string.saved_total_steps), defaultTotalSteps));
         long defaultLastSync = 0;
         LastSync = sharedPref.getLong(getString(R.string.saved_last_sync), defaultLastSync);
+
+        stepCountView = (TextView) findViewById(R.id.stepnumber);
 
         mapButton = (FloatingActionButton)findViewById(R.id.FAB_map);
         mapButton.setOnClickListener(new MapListener());
@@ -106,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
         if (mClient.isConnected()) {
             mClient.disconnect();
         }
+        isRunning = false;
     }
 
     @Override
@@ -315,18 +340,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addToStepCount(int newSteps) {
-        int oldSteps = totalSteps;
+        final int oldSteps = totalSteps;
         totalSteps += newSteps;
-        TextView stepCountView = (TextView) findViewById(R.id.stepnumber);
-        long startCountTime = getCurrentTime();
-        while(oldSteps < totalSteps) {
-            long currentTime = getCurrentTime();
-            if(currentTime - startCountTime > 1) {
-                stepCountView.setText(String.valueOf(oldSteps));
-                oldSteps++;
-                startCountTime = currentTime;
+        Thread background = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    for (int i = oldSteps; i <= totalSteps && isRunning; i += 3) {
+                        Thread.sleep(FRAME_TIME_MS);
+                        Bundle data= new Bundle();
+                        data.putInt(KEY, i);
+                        Message message = handler.obtainMessage();
+                        message.setData(data);
+                        handler.sendMessage(message);
+                    }
+                }
+                catch (Throwable t) {
+                }
             }
-        }
+        });
+        isRunning = true;
+        background.start();
+        setupCurrentCity();
     }
 
     public int getTotalSteps() {
@@ -362,6 +396,14 @@ public class MainActivity extends AppCompatActivity {
             result = getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    private void setupCurrentCity() {
+        mCityPlans = new CityPlans(getTotalSteps());
+        TextView cityname_text = (TextView) findViewById(R.id.main_cityname);
+        cityname_text.setText(getResources().getString(mCityPlans.getCurrentCityName()));
+        RelativeLayout main = (RelativeLayout) findViewById(R.id.main_frame);
+        main.setBackground(getResources().getDrawable(mCityPlans.getCurrentBgImage()));
     }
 }
 
