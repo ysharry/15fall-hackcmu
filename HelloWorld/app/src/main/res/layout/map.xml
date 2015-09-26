@@ -6,18 +6,44 @@
     tools:context="MapActivity">
 
     <org.hackcmu.helloworld.MapView
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="-25dp"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/view"
-        android:layout_alignBottom="@+id/cloud_frame" />
+        android:layout_height="550dp"
+        android:id="@+id/view" />
 
     <FrameLayout
         android:layout_width="fill_parent"
-        android:layout_height="250dp"
-        android:layout_marginTop="330dp"
-        android:background="@drawable/cloud"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:id="@+id/cloud_frame"
         android:layout_alignParentStart="true">
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:src="@drawable/cloud"/>
+        <TextView
+            android:id="@+id/steps_left"
+            android:text="1486"
+            android:textColor="#979797"
+            android:textSize="40sp"
+            android:fontFamily="Karla-Bold"
+            android:layout_marginTop="178dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginBottom="1dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+        <TextView
+            android:id="@+id/prompts"
+            android:layout_gravity="bottom"
+            android:text="steps till your next adventure ..."
+            android:textColor="#979797"
+            android:textSize="16sp"
+            android:fontFamily="Karla-Bold"
+            android:layout_marginLeft="18dp"
+            android:layout_marginBottom="17dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
     </FrameLayout>
 
 

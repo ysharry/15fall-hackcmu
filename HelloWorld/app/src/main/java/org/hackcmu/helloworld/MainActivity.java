@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private int totalSteps = 0;
     private long LastSync;
 
-    private Button friendButton;
+    private FloatingActionButton mapButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,8 +73,8 @@ public class MainActivity extends AppCompatActivity {
         long defaultLastSync = 0;
         LastSync = sharedPref.getLong(getString(R.string.saved_last_sync), defaultLastSync);
 
-//        friendButton = (Button)findViewById(R.id.FAB_map);
-//        friendButton.setOnClickListener(new FriendRatingListener());
+        mapButton = (FloatingActionButton)findViewById(R.id.FAB_map);
+        mapButton.setOnClickListener(new MapListener());
 
         buildFitnessClient();
     }
@@ -318,13 +319,13 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    class FriendRatingListener implements View.OnClickListener {
+    class MapListener implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
             // TODO Auto-generated method stub
             Intent intent = new Intent();
-            intent.setClass(MainActivity.this, FriendRating.class);
+            intent.setClass(MainActivity.this, MapActivity.class);
             MainActivity.this.startActivity(intent);
 
         }
