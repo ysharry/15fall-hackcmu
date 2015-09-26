@@ -3,6 +3,16 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
+    
     <string name="app_id">YOUR_APP_ID</string>
+
+    <!-- Labels for Shared Preferences -->
+    <string name="saved_total_steps">SAVED_TOTAL_STEPS</string>
+    <string name="saved_last_sync">SAVED_LAST_SYNC</string>
+    
+    <!-- MainActivity -->
+    <string name="steps_label">steps</string>
+
+    <!-- Places -->
+    <string name="places_arctic_ocean">Arctic Ocean</string>
 </resources>

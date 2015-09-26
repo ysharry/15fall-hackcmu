@@ -1,12 +1,15 @@
 package org.hackcmu.helloworld;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -48,10 +51,24 @@ public class MainActivity extends Activity {
 
     private static final String DATE_FORMAT = "yyyy.MM.dd HH:mm:ss";
 
+    private static int totalSteps = 0;
+    private static long LastSync;
+    private static boolean firstSyncToday = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        int defaultTotalSteps = 0;
+        addToStepCount(sharedPref.getInt(getString(R.string.saved_total_steps), defaultTotalSteps),0);
+        long defaultLastSync = 0;
+        LastSync = sharedPref.getLong(getString(R.string.saved_last_sync), defaultLastSync);
+
+        if(LastSync >= getTodayStartTime()) {
+            firstSyncToday = false;
+        }
 
         buildFitnessClient();
     }
@@ -113,58 +130,7 @@ public class MainActivity extends Activity {
                                 // Now you can make calls to the Fitness APIs.
                                 // Put application specific code here.
 
-                                // Setting a start and end date using a range of 1 week before this moment.
-                                Calendar cal = Calendar.getInstance();
-                                Date now = new Date();
-                                cal.setTime(now);
-                                long endTime = cal.getTimeInMillis();
-                                cal.add(Calendar.WEEK_OF_YEAR, -1);
-                                long startTime = cal.getTimeInMillis();
-
-                                SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-                                Log.i(LOG_TAG, "Range Start: " + dateFormat.format(startTime));
-                                Log.i(LOG_TAG, "Range End: " + dateFormat.format(endTime));
-
-                                DataReadRequest readRequest = new DataReadRequest.Builder()
-                                        // The data request can specify multiple data types to return, effectively
-                                        // combining multiple data queries into one call.
-                                        // In this example, it's very unlikely that the request is for several hundred
-                                        // datapoints each consisting of a few steps and a timestamp.  The more likely
-                                        // scenario is wanting to see how many steps were walked per day, for 7 days.
-                                        .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                                                // Analogous to a "Group By" in SQL, defines how data should be aggregated.
-                                                // bucketByTime allows for a time span, whereas bucketBySession would allow
-                                                // bucketing by "sessions", which would need to be defined in code.
-                                        .bucketByTime(1, TimeUnit.DAYS)
-                                        .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                                        .build();
-
-                                // Invoke the History API to fetch the data with the query and await the result of
-                                // the read request.
-                                PendingResult<DataReadResult> pendingResult =
-                                        Fitness.HistoryApi.readData(mClient, readRequest);
-
-                                pendingResult.setResultCallback(
-                                        new ResultCallback<DataReadResult>() {
-                                            @Override
-                                            public void onResult(DataReadResult dataReadResult) {
-                                                Log.d(LOG_TAG, "got result!!!, size: " + dataReadResult.getBuckets().size());
-                                                if (dataReadResult.getBuckets().size() > 0) {
-                                                    for (Bucket bucket : dataReadResult.getBuckets()) {
-                                                        List<DataSet> dataSets = bucket.getDataSets();
-                                                        for (DataSet dataSet : dataSets) {
-                                                            // Show the data points
-                                                            processDataSet(dataSet);
-                                                        }
-                                                    }
-                                                }
-                                                Log.d(LOG_TAG, "datasets size: " + dataReadResult.getDataSets().size());
-                                            }
-                                        }
-                                );
-
-                                Log.d(LOG_TAG, "callback set");
-
+                                syncStepCount();
                             }
 
                             @Override
@@ -211,20 +177,91 @@ public class MainActivity extends Activity {
                 .build();
     }
 
+    private void syncStepCount() {
+        long endTime = getCurrentTime();
+        long startTime = LastSync;
+
+        if(firstSyncToday) {
+            startTime = getTodayStartTime();
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        Log.i(LOG_TAG, "Range Start: " + dateFormat.format(startTime));
+        Log.i(LOG_TAG, "Range End: " + dateFormat.format(endTime));
+
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                // The data request can specify multiple data types to return, effectively
+                // combining multiple data queries into one call.
+                // In this example, it's very unlikely that the request is for several hundred
+                // datapoints each consisting of a few steps and a timestamp.  The more likely
+                // scenario is wanting to see how many steps were walked per day, for 7 days.
+                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                        // Analogous to a "Group By" in SQL, defines how data should be aggregated.
+                        // bucketByTime allows for a time span, whereas bucketBySession would allow
+                        // bucketing by "sessions", which would need to be defined in code.
+                .bucketByTime(1, TimeUnit.DAYS)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        // Invoke the History API to fetch the data with the query and await the result of
+        // the read request.
+        PendingResult<DataReadResult> pendingResult =
+                Fitness.HistoryApi.readData(mClient, readRequest);
+
+        pendingResult.setResultCallback(
+                new ResultCallback<DataReadResult>() {
+                    @Override
+                    public void onResult(DataReadResult dataReadResult) {
+                        Log.d(LOG_TAG, "got result!!!, size: " + dataReadResult.getBuckets().size());
+                        if (dataReadResult.getBuckets().size() > 0) {
+                            for (Bucket bucket : dataReadResult.getBuckets()) {
+                                List<DataSet> dataSets = bucket.getDataSets();
+                                for (DataSet dataSet : dataSets) {
+                                    // Show the data points
+                                    processDataSet(dataSet);
+                                }
+                            }
+                        }
+                        Log.d(LOG_TAG, "datasets size: " + dataReadResult.getDataSets().size());
+                    }
+                }
+        );
+    }
+
     private void processDataSet(DataSet dataSet) {
         Log.i(LOG_TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
+        int multidaySteps = 0;
+        int todaySteps = 0;
+
         for (DataPoint dp : dataSet.getDataPoints()) {
-            Log.i(LOG_TAG, "Data point:");
-            Log.i(LOG_TAG, "\tType: " + dp.getDataType().getName());
-            Log.i(LOG_TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
-            Log.i(LOG_TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+//            Log.i(LOG_TAG, "Data point:");
+//            Log.i(LOG_TAG, "\tType: " + dp.getDataType().getName());
+//            Log.i(LOG_TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+//            Log.i(LOG_TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
             for(Field field : dp.getDataType().getFields()) {
-                Log.i(LOG_TAG, "\tField: " + field.getName() +
-                        " Value: " + dp.getValue(field));
+//                Log.i(LOG_TAG, "\tField: " + field.getName() +
+//                        " Value: " + dp.getValue(field));
+                if(field.getName().equals("steps")) {
+                    if(firstSyncToday && dp.getDataType().indexOf(field) + 1 == dp.getDataType().getFields().size()) {
+                        todaySteps = dp.getValue(field).asInt();
+                    } else {
+                        multidaySteps += dp.getValue(field).asInt();
+                    }
+                }
             }
         }
+
+        addToStepCount(multidaySteps, todaySteps);
+
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(getString(R.string.saved_total_steps), getTotalSteps());
+        editor.putLong(getString(R.string.saved_last_sync), getTodayStartTime());
+        editor.apply();
+
+        firstSyncToday = false;
     }
 
     @Override
@@ -247,5 +284,33 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private long getCurrentTime() {
+        Calendar cal = Calendar.getInstance();
+        Date now = new Date();
+        cal.setTime(now);
+        return cal.getTimeInMillis();
+    }
+
+    private long getTodayStartTime() {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.MILLISECOND, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.HOUR_OF_DAY, 0);
+
+        return today.getTimeInMillis();
+    }
+
+    private void addToStepCount(int multidaySteps, int todaySteps) {
+        totalSteps += multidaySteps;
+        int actualTotaoSteps = totalSteps += todaySteps;
+        TextView stepCountView = (TextView) findViewById(R.id.stepnumber);
+        stepCountView.setText(String.valueOf(actualTotaoSteps));
+    }
+
+    public int getTotalSteps() {
+        return totalSteps;
     }
 }
