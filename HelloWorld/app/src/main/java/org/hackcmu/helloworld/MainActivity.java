@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.facebook.FacebookSdk;
@@ -66,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
 
         initialize();
+
+//        RelativeLayout main = (RelativeLayout) findViewById(R.id.main_frame);
+//        main.setPadding(0,getStatusBarHeight(),0,0);
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         int defaultTotalSteps = 0;
@@ -313,12 +315,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addToStepCount(int newSteps) {
-        int oldsteps = totalSteps;
+
+        int oldSteps = totalSteps;
         totalSteps += newSteps;
         TextView stepCountView = (TextView) findViewById(R.id.stepnumber);
-        while(oldsteps < totalSteps) {
-            stepCountView.setText(String.valueOf(oldsteps));
-            oldsteps++;
+        long startCountTime = getCurrentTime();
+        while(oldSteps < totalSteps) {
+            long currentTime = getCurrentTime();
+            if(currentTime - startCountTime > 1) {
+                stepCountView.setText(String.valueOf(oldSteps));
+                oldSteps++;
+                startCountTime = currentTime;
+            }
         }
     }
 
@@ -345,6 +353,16 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    // A method to find height of the status bar
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 }
 
