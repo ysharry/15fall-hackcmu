@@ -56,7 +56,21 @@
         app:fabSize="normal"
         app:elevation="6dp"
         app:pressedTranslationZ="12dp" />
-
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/FAB_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="24dp"
+        android:layout_marginBottom="34dp"
+        android:src="@drawable/ico_bearhead"
+        android:scaleType="center"
+        app:borderWidth="0dp"
+        app:backgroundTint="#00BBD3"
+        app:fabSize="normal"
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp" />
 
 
 

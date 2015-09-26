@@ -315,9 +315,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addToStepCount(int newSteps) {
+        int oldSteps = totalSteps;
         totalSteps += newSteps;
         TextView stepCountView = (TextView) findViewById(R.id.stepnumber);
-        stepCountView.setText(String.valueOf(totalSteps));
+        long startCountTime = getCurrentTime();
+        while(oldSteps < totalSteps) {
+            long currentTime = getCurrentTime();
+            if(currentTime - startCountTime > 1) {
+                stepCountView.setText(String.valueOf(oldSteps));
+                oldSteps++;
+                startCountTime = currentTime;
+            }
+        }
     }
 
     public int getTotalSteps() {
