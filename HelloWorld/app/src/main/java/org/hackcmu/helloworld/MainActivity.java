@@ -51,24 +51,21 @@ public class MainActivity extends Activity {
 
     private static final String DATE_FORMAT = "yyyy.MM.dd HH:mm:ss";
 
-    private static int totalSteps = 0;
-    private static long LastSync;
-    private static boolean firstSyncToday = true;
+    private int totalSteps = 0;
+    private long LastSync;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initialize();
+
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         int defaultTotalSteps = 0;
-        addToStepCount(sharedPref.getInt(getString(R.string.saved_total_steps), defaultTotalSteps),0);
+        addToStepCount(sharedPref.getInt(getString(R.string.saved_total_steps), defaultTotalSteps));
         long defaultLastSync = 0;
         LastSync = sharedPref.getLong(getString(R.string.saved_last_sync), defaultLastSync);
-
-        if(LastSync >= getTodayStartTime()) {
-            firstSyncToday = false;
-        }
 
         buildFitnessClient();
     }
@@ -180,10 +177,9 @@ public class MainActivity extends Activity {
     private void syncStepCount() {
         long endTime = getCurrentTime();
         long startTime = LastSync;
-
-        if(firstSyncToday) {
-            startTime = getTodayStartTime();
-        }
+        Log.d(LOG_TAG, "start time should be: " + startTime);
+        LastSync = endTime;
+        Log.d(LOG_TAG, "New LastSync: " + LastSync);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         Log.i(LOG_TAG, "Range Start: " + dateFormat.format(startTime));
@@ -232,8 +228,7 @@ public class MainActivity extends Activity {
         Log.i(LOG_TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
-        int multidaySteps = 0;
-        int todaySteps = 0;
+        int newSteps = 0;
 
         for (DataPoint dp : dataSet.getDataPoints()) {
 //            Log.i(LOG_TAG, "Data point:");
@@ -244,24 +239,18 @@ public class MainActivity extends Activity {
 //                Log.i(LOG_TAG, "\tField: " + field.getName() +
 //                        " Value: " + dp.getValue(field));
                 if(field.getName().equals("steps")) {
-                    if(firstSyncToday && dp.getDataType().indexOf(field) + 1 == dp.getDataType().getFields().size()) {
-                        todaySteps = dp.getValue(field).asInt();
-                    } else {
-                        multidaySteps += dp.getValue(field).asInt();
-                    }
+                    newSteps += dp.getValue(field).asInt();
                 }
             }
         }
 
-        addToStepCount(multidaySteps, todaySteps);
+        addToStepCount(newSteps);
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(getString(R.string.saved_total_steps), getTotalSteps());
-        editor.putLong(getString(R.string.saved_last_sync), getTodayStartTime());
+        editor.putLong(getString(R.string.saved_last_sync), LastSync);
         editor.apply();
-
-        firstSyncToday = false;
     }
 
     @Override
@@ -303,14 +292,21 @@ public class MainActivity extends Activity {
         return today.getTimeInMillis();
     }
 
-    private void addToStepCount(int multidaySteps, int todaySteps) {
-        totalSteps += multidaySteps;
-        int actualTotaoSteps = totalSteps += todaySteps;
+    private void addToStepCount(int newSteps) {
+        totalSteps += newSteps;
         TextView stepCountView = (TextView) findViewById(R.id.stepnumber);
-        stepCountView.setText(String.valueOf(actualTotaoSteps));
+        stepCountView.setText(String.valueOf(totalSteps));
     }
 
     public int getTotalSteps() {
         return totalSteps;
+    }
+
+    private void initialize() {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(getString(R.string.saved_total_steps), getTotalSteps());
+        editor.putLong(getString(R.string.saved_last_sync), getTodayStartTime());
+        editor.apply();
     }
 }
