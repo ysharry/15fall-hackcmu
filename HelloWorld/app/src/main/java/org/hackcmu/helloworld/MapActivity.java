@@ -46,5 +46,6 @@ public class MapActivity extends Activity {
         TextView prompts_text = (TextView) findViewById(R.id.prompts);
         steps_left_text.setTypeface(myTypeface);
         prompts_text.setTypeface(myTypeface);
+
     }
 }

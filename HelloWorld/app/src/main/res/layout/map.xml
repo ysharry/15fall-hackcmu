@@ -6,11 +6,12 @@
     tools:context="MapActivity">
 
     <org.hackcmu.helloworld.MapView
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="-25dp"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/view" />
+        android:id="@+id/view"
+        android:layout_marginBottom="159dp"
+        android:layout_above="@+id/cloud_frame"
+        android:layout_alignParentLeft="true" />
 
     <!--<ImageView-->
         <!--android:layout_width="match_parent"-->
@@ -32,11 +33,12 @@
         android:layout_alignParentBottom="true"
         android:id="@+id/cloud_frame"
         android:layout_alignParentStart="true">
+
         <ImageView
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:scaleType="fitXY"
-            android:src="@drawable/cloud"/>
+            android:scaleType="center"
+            android:src="@drawable/circle"/>
         <TextView
             android:id="@+id/steps_left"
             android:text="1486"
@@ -60,6 +62,15 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"/>
     </FrameLayout>
+
+    <ImageView
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/cloud"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="30dp" />
 
 
 </RelativeLayout>
