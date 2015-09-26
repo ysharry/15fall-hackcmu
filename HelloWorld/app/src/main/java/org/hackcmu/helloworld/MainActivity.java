@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.facebook.FacebookSdk;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
@@ -34,8 +35,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import com.facebook.FacebookSdk;
 
 public class MainActivity extends Activity {
 
@@ -73,16 +72,9 @@ public class MainActivity extends Activity {
         long defaultLastSync = 0;
         LastSync = sharedPref.getLong(getString(R.string.saved_last_sync), defaultLastSync);
 
-<<<<<<< HEAD
-=======
-        if(LastSync >= getTodayStartTime()) {
-            firstSyncToday = false;
-        }
-
         friendButton = (Button)findViewById(R.id.friendButton);
         friendButton.setOnClickListener(new FriendRatingListener());
 
->>>>>>> origin/master
         buildFitnessClient();
     }
 
@@ -318,14 +310,14 @@ public class MainActivity extends Activity {
         return totalSteps;
     }
 
-<<<<<<< HEAD
     private void initialize() {
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(getString(R.string.saved_total_steps), getTotalSteps());
         editor.putLong(getString(R.string.saved_last_sync), getTodayStartTime());
         editor.apply();
-=======
+    }
+
     class FriendRatingListener implements View.OnClickListener {
 
         @Override
@@ -337,8 +329,6 @@ public class MainActivity extends Activity {
 
         }
 
-
->>>>>>> origin/master
     }
 }
 
