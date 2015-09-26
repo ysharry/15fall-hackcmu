@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
 
     private GoogleApiClient mClient = null;
 
-    private static final String DATE_FORMAT = "dd/M/yyyy";
+    private static final String DATE_FORMAT = "yyyy.MM.dd HH:mm:ss";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +103,7 @@ public class MainActivity extends Activity {
         // Create the Google API Client
         mClient = new GoogleApiClient.Builder(this)
                 .addApi(Fitness.HISTORY_API)
-                .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
+                .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ_WRITE))
                 .addConnectionCallbacks(
                         new GoogleApiClient.ConnectionCallbacks() {
 
@@ -158,6 +158,7 @@ public class MainActivity extends Activity {
                                                         }
                                                     }
                                                 }
+                                                Log.d(LOG_TAG, "datasets size: " + dataReadResult.getDataSets().size());
                                             }
                                         }
                                 );
