@@ -76,6 +76,17 @@ public class MainActivity extends AppCompatActivity {
         mapButton = (FloatingActionButton)findViewById(R.id.FAB_map);
         mapButton.setOnClickListener(new MapListener());
 
+        FloatingActionButton fab_map = (FloatingActionButton) findViewById(R.id.FAB_map);
+        fab_map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.putExtra(getResources().getString(R.string.step_count_intent_label), totalSteps);
+                intent.setClass(MainActivity.this, MapActivity.class);
+                MainActivity.this.startActivity(intent);
+            }
+        });
+
         buildFitnessClient();
     }
 

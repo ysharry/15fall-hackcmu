@@ -7,6 +7,8 @@
     <string name="app_id">YOUR_APP_ID</string>
     <string name="facebook_app_id">489256354569300</string>
 
+    <string name="step_count_intent_label">STEP_COUNT_INTENT_LABEL</string>
+
     <!-- Labels for Shared Preferences -->
     <string name="saved_total_steps">SAVED_TOTAL_STEPS</string>
     <string name="saved_last_sync">SAVED_LAST_SYNC</string>
