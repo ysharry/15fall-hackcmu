@@ -35,7 +35,7 @@ public class MapActivity extends Activity {
         animSet.addAnimation(translateAnim);
         animSet.addAnimation(alphaAnim);
         animSet.setInterpolator(new FastOutSlowInInterpolator());
-        animSet.setDuration(2000);
+        animSet.setDuration(1500);
         cloudFrame.startAnimation(animSet);
 
         Intent callingIntent = getIntent();
@@ -47,5 +47,9 @@ public class MapActivity extends Activity {
         steps_left_text.setTypeface(myTypeface);
         prompts_text.setTypeface(myTypeface);
 
+<<<<<<< HEAD
+=======
+//        ImageView map_paw = (ImageView) findViewById(R.id.map_paw);
+>>>>>>> origin/master
     }
 }
