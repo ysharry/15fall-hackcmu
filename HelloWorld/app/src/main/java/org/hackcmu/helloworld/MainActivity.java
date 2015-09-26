@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -55,6 +57,7 @@ public class MainActivity extends Activity {
     private static long LastSync;
     private static boolean firstSyncToday = true;
 
+    private Button friendButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +72,9 @@ public class MainActivity extends Activity {
         if(LastSync >= getTodayStartTime()) {
             firstSyncToday = false;
         }
+
+        friendButton = (Button)findViewById(R.id.friendButton);
+        friendButton.setOnClickListener(new FriendRatingListener());
 
         buildFitnessClient();
     }
@@ -313,4 +319,19 @@ public class MainActivity extends Activity {
     public int getTotalSteps() {
         return totalSteps;
     }
+
+    class FriendRatingListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            // TODO Auto-generated method stub
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, FriendRating.class);
+            MainActivity.this.startActivity(intent);
+
+        }
+
+
+    }
 }
+

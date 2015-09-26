@@ -36,5 +36,11 @@
         android:text="Arctic Ocean"
         android:textSize="20sp"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id = "@+id/friendButton"
+        android:text = "Button"/>
+
 
 </RelativeLayout>
