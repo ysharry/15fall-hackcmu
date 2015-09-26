@@ -1,11 +1,11 @@
 package org.hackcmu.helloworld;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,7 +36,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -72,8 +72,8 @@ public class MainActivity extends Activity {
         long defaultLastSync = 0;
         LastSync = sharedPref.getLong(getString(R.string.saved_last_sync), defaultLastSync);
 
-        friendButton = (Button)findViewById(R.id.friendButton);
-        friendButton.setOnClickListener(new FriendRatingListener());
+//        friendButton = (Button)findViewById(R.id.FAB_map);
+//        friendButton.setOnClickListener(new FriendRatingListener());
 
         buildFitnessClient();
     }
