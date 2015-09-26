@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -74,6 +75,17 @@ public class MainActivity extends AppCompatActivity {
 
 //        friendButton = (Button)findViewById(R.id.FAB_map);
 //        friendButton.setOnClickListener(new FriendRatingListener());
+
+        FloatingActionButton fab_map = (FloatingActionButton) findViewById(R.id.FAB_map);
+        fab_map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.putExtra(getResources().getString(R.string.step_count_intent_label), totalSteps);
+                intent.setClass(MainActivity.this, MapActivity.class);
+                MainActivity.this.startActivity(intent);
+            }
+        });
 
         buildFitnessClient();
     }
