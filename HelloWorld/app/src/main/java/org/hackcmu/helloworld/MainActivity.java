@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -33,6 +35,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.facebook.FacebookSdk;
+
 public class MainActivity extends Activity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -54,10 +58,12 @@ public class MainActivity extends Activity {
     private int totalSteps = 0;
     private long LastSync;
 
+    private Button friendButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FacebookSdk.sdkInitialize(getApplicationContext());
 
         initialize();
 
@@ -67,6 +73,16 @@ public class MainActivity extends Activity {
         long defaultLastSync = 0;
         LastSync = sharedPref.getLong(getString(R.string.saved_last_sync), defaultLastSync);
 
+<<<<<<< HEAD
+=======
+        if(LastSync >= getTodayStartTime()) {
+            firstSyncToday = false;
+        }
+
+        friendButton = (Button)findViewById(R.id.friendButton);
+        friendButton.setOnClickListener(new FriendRatingListener());
+
+>>>>>>> origin/master
         buildFitnessClient();
     }
 
@@ -302,11 +318,27 @@ public class MainActivity extends Activity {
         return totalSteps;
     }
 
+<<<<<<< HEAD
     private void initialize() {
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(getString(R.string.saved_total_steps), getTotalSteps());
         editor.putLong(getString(R.string.saved_last_sync), getTodayStartTime());
         editor.apply();
+=======
+    class FriendRatingListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            // TODO Auto-generated method stub
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, FriendRating.class);
+            MainActivity.this.startActivity(intent);
+
+        }
+
+
+>>>>>>> origin/master
     }
 }
+
