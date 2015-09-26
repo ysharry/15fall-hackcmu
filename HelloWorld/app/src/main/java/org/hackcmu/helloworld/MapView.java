@@ -21,9 +21,9 @@ public class MapView extends View {
 
     private Bitmap bmp;
     private Bitmap locator;
-    private int[] x = {156,110,91,25,95,55};
-    private int[] y = {14,90,200,288,258,322};
-    private int[] dis = {0,5000,10000,15000,19500,24000};
+    private int[] x = {156,110,91,58,25,60,95,75,55};
+    private int[] y = {14,90,200,244,288,273,258,290,322};
+    private int[] dis = {0,5000,10000,12500,15000,17250,19500,21750,24000};
     private float xmultiplier = 4f;
     private float ymultiplier = 4f;
     private float xoffset = -54f;
@@ -34,6 +34,7 @@ public class MapView extends View {
     private int aXDiff;
     private int bYDiff;
     private long startTime;
+    private boolean passedMidpoint = true;
 
     public MapView(Context context, AttributeSet attrs){
         super(context,attrs);
@@ -49,17 +50,21 @@ public class MapView extends View {
         i--;
         int exceed_amount = steps - dis[i];
         int xdiff, ydiff,interv;
+
         if(i < 4){
+            if(i % 2 == 1) {
+                passedMidpoint = false;
+            }
             xdiff = x[i+1]-x[i];
             ydiff = y[i+1]-y[i];
             interv = dis[i+1]-dis[i];
             a = x[i] + xdiff * exceed_amount/interv;
             b = y[i] + ydiff * exceed_amount/interv;
         }
-        if(i % 2 == 1) i--;
 
-        aXDiff = a - x[i];
-        bYDiff = b - y[i];
+
+
+
     }
     public void onDraw(Canvas canvas){
         super.onDraw(canvas);
@@ -77,19 +82,35 @@ public class MapView extends View {
 
 //        Log.d("Canvas", "height: " + h + ", width: " + w);
 
+
+
         Rect bg = new Rect(0,0,w,h);
         canvas.drawBitmap(bmp, null, bg, null);
 
-        float progress = (getCurrentTime() - 1000 - startTime) / duration;
+        if(passedMidpoint) {
+            aXDiff = a - x[i];
+            bYDiff = b - y[i];
+            float progress = (getCurrentTime() - 1000 - startTime) / duration;
 
-        if(progress < 0) progress = 0;
+            if (progress < 0) progress = 0;
 
-        float currentX = x[i] + aXDiff * progress;
-        float currentY = y[i] + bYDiff * progress;
-        Log.d("Canvas", "Progress: " + progress + "Curr X: " + currentX + ", Curr Y: " + currentY);
-        canvas.drawBitmap(locator,currentX* xmultiplier + xoffset,currentY* ymultiplier + yoffset,null);
+            float currentX = x[i] + aXDiff * progress;
+            float currentY = y[i] + bYDiff * progress;
+            //Log.d("Canvas", "Progress: " + progress + "Curr X: " + currentX + ", Curr Y: " + currentY);
+            canvas.drawBitmap(locator, currentX * xmultiplier + xoffset, currentY * ymultiplier + yoffset, null);
 
-        if(progress < 1) {
+            if (progress < 1) {
+                invalidate();
+            }
+        } else {
+            aXDiff = x[i] - x[i-1];
+            bYDiff = y[i] - y[i-1];
+            float progress = (getCurrentTime() - 100 - startTime) / duration;
+            if(progress < 0) progress = 0;
+            float currentX = x[i-1] + aXDiff * progress;
+            float currentY = y[i-1] + bYDiff * progress;
+            canvas.drawBitmap(locator, currentX * xmultiplier + xoffset, currentY * ymultiplier + yoffset, null);
+            if(currentX == x[i]){ passedMidpoint = true;}
             invalidate();
         }
     }
