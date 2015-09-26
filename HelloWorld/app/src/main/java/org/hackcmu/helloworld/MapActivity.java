@@ -1,14 +1,16 @@
 package org.hackcmu.helloworld;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 /**
  * Created by ysharry on 9/26/15.
@@ -25,10 +27,24 @@ public class MapActivity extends Activity {
         cloudFrame = (FrameLayout)findViewById(R.id.cloud_frame);
         AnimationSet set = new AnimationSet(true);
         // Using property animation
-        Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-                0.0f, Animation.RELATIVE_TO_SELF, 0.8f,
+        Animation translateAnim = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                0.0f, Animation.RELATIVE_TO_SELF, 0.6f,
                 Animation.RELATIVE_TO_SELF, 0.0f);
-        animation.setDuration(2000);
-        cloudFrame.startAnimation(animation);
+        Animation alphaAnim = new AlphaAnimation(0.6f,1f);
+        AnimationSet animSet = new AnimationSet(true);
+        animSet.addAnimation(translateAnim);
+        animSet.addAnimation(alphaAnim);
+        animSet.setInterpolator(new FastOutSlowInInterpolator());
+        animSet.setDuration(2000);
+        cloudFrame.startAnimation(animSet);
+
+        Intent callingIntent = getIntent();
+        int totalSteps = callingIntent.getIntExtra(getResources().getString(R.string.step_count_intent_label),0);
+
+        Typeface myTypeface = Typeface.createFromAsset(getAssets(), "karla_bold.ttf");
+        TextView steps_left_text = (TextView) findViewById(R.id.steps_left);
+        TextView prompts_text = (TextView) findViewById(R.id.prompts);
+        steps_left_text.setTypeface(myTypeface);
+        prompts_text.setTypeface(myTypeface);
     }
 }

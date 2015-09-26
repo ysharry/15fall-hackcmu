@@ -4,11 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
+import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
-
-import java.util.jar.Attributes;
 
 /**
  * Created by ysharry on 9/26/15.
@@ -20,8 +19,10 @@ public class MapView extends View {
     private int[] x = {156,91,25,95,55};
     private int[] y = {14,200,288,258,322};
     private int[] dis = {0,10000,15000,19500,24000};
-    private float xoffset = 2.5f;
-    private float yoffset = 2.5f;
+    private float xmultiplier = 4f;
+    private float ymultiplier = 4f;
+    private float xoffset = -54f;
+    private float yoffset = 54f;
 
     public MapView(Context context, AttributeSet attrs){
         super(context,attrs);
@@ -30,7 +31,22 @@ public class MapView extends View {
     }
     public void onDraw(Canvas canvas){
         super.onDraw(canvas);
-        canvas.drawBitmap(bmp, 0, 0, null);
+
+        int canvasHeight = canvas.getHeight();
+        int canvasWidth = canvas.getWidth();
+        int h = canvasHeight;
+        int w = canvasWidth;
+
+        if(canvasHeight / canvasWidth > 16/9) {
+            w = canvasHeight * 9 / 16;
+        } else {
+            h = canvasWidth * 16 / 9;
+        }
+
+        Log.d("Canvas","height: " + h + ", width: " + w);
+
+        Rect bg = new Rect(0,0,w,h);
+        canvas.drawBitmap(bmp, null, bg, null);
 
         /*int i = 0;
         while(i < 5 && steps >= dis[i]){
@@ -48,9 +64,7 @@ public class MapView extends View {
         }*/
 
 
-        canvas.drawBitmap(locator,x[0]*xoffset,y[0]*yoffset,null);
-
-
+        canvas.drawBitmap(locator,x[0]* xmultiplier + xoffset,y[0]* ymultiplier + yoffset,null);
 
     }
 
