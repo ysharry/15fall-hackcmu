@@ -6,26 +6,44 @@
     tools:context="MapActivity">
 
     <org.hackcmu.helloworld.MapView
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="-20dp"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/view"
-        android:layout_marginBottom="159dp"
-        android:layout_above="@+id/cloud_frame"
-        android:layout_alignParentLeft="true" />
+        android:id="@+id/view" />
 
-    <!--<ImageView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:scaleType="centerCrop"-->
-        <!--android:src="@drawable/map"/>-->
-
-    <!--<ImageView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:src="@drawable/ico_paw"-->
-        <!--android:id="@+id/map_paw"-->
-        <!--android:layout_marginLeft="156dp"-->
-        <!--android:layout_marginTop="14dp"/>-->
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:id="@+id/visited"
+        android:layout_alignParentStart="true">
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginLeft="166dp"
+            android:scaleType="center"
+            android:src="@drawable/circle"/>
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="326dp"
+            android:layout_marginLeft="18dp"
+            android:scaleType="center"
+            android:src="@drawable/circle"
+            android:visibility="invisible"
+            android:id="@+id/map_london_circle"/>
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="222dp"
+            android:layout_marginLeft="90dp"
+            android:scaleType="center"
+            android:src="@drawable/circle"
+            android:visibility="invisible"
+            android:id="@+id/map_norway_circle"/>
+    </FrameLayout>
 
     <FrameLayout
         android:layout_width="fill_parent"
@@ -33,12 +51,11 @@
         android:layout_alignParentBottom="true"
         android:id="@+id/cloud_frame"
         android:layout_alignParentStart="true">
-
         <ImageView
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:scaleType="center"
-            android:src="@drawable/circle"/>
+            android:scaleType="fitXY"
+            android:src="@drawable/cloud"/>
         <TextView
             android:id="@+id/steps_left"
             android:text="1486"
@@ -62,15 +79,6 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"/>
     </FrameLayout>
-
-    <ImageView
-        android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
-        android:scaleType="fitXY"
-        android:src="@drawable/cloud"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginTop="30dp" />
 
 
 </RelativeLayout>

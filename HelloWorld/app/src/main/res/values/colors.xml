@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="text_arctic_primary">#676969</color>
+    <color name="text_arcitc_2nd">#9A9D9D</color>
+
+    <color name="text_london_primary">#FFFFFF</color>
+    <color name="text_london_2nd">#FFFF00</color>
+
+    <color name="text_norway_primary">#676969</color>
+    <color name="text_norway_2nd">#9A9D9D</color>
+</resources>

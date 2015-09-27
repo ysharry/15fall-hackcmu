@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import java.util.Calendar;
@@ -21,8 +20,8 @@ public class MapView extends View {
 
     private Bitmap bmp;
     private Bitmap locator;
-    private int[] x = {156,110,91,58,25,60,95,75,55};
-    private int[] y = {14,90,200,244,288,273,258,290,322};
+    private int[] x = {156,110,83,55,25,60,95,75,55};
+    private int[] y = {14,90,200,240,288,273,258,290,322};
     private int[] dis = {0,5000,10000,12500,15000,17250,19500,21750,24000};
     private float xmultiplier = 4f;
     private float ymultiplier = 4f;
@@ -35,23 +34,27 @@ public class MapView extends View {
     private int bYDiff;
     private long startTime;
     private boolean passedMidpoint = true;
+    private boolean needToWait = true;
 
     public MapView(Context context, AttributeSet attrs){
         super(context,attrs);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.map);
+        if(MainActivity.mCityPlans.getCurrentLevel() >= 1) {
+            bmp = BitmapFactory.decodeResource(getResources(), R.drawable.map_london);
+        }
         locator = BitmapFactory.decodeResource(getResources(), R.drawable.ico_paw);
 
-        int steps = 14000;
+        int steps = MainActivity.mCityPlans.getCurrentSteps();
         startTime = getCurrentTime();
 
-        while(i < 5 && steps >= dis[i]){
+        while(i < 6 && steps >= dis[i]){
             i++;
         }
         i--;
         int exceed_amount = steps - dis[i];
         int xdiff, ydiff,interv;
 
-        if(i < 4){
+        if(i < 6){
             if(i % 2 == 1) {
                 passedMidpoint = false;
             }
@@ -92,6 +95,10 @@ public class MapView extends View {
             bYDiff = b - y[i];
             float progress = (getCurrentTime() - 1000 - startTime) / duration;
 
+            if(!needToWait) {
+                progress = (getCurrentTime() - startTime) / duration;
+            }
+
             if (progress < 0) progress = 0;
 
             float currentX = x[i] + aXDiff * progress;
@@ -105,12 +112,16 @@ public class MapView extends View {
         } else {
             aXDiff = x[i] - x[i-1];
             bYDiff = y[i] - y[i-1];
-            float progress = (getCurrentTime() - 100 - startTime) / duration;
+            float progress = (getCurrentTime() - 1000 - startTime) / duration;
             if(progress < 0) progress = 0;
             float currentX = x[i-1] + aXDiff * progress;
             float currentY = y[i-1] + bYDiff * progress;
             canvas.drawBitmap(locator, currentX * xmultiplier + xoffset, currentY * ymultiplier + yoffset, null);
-            if(currentX == x[i]){ passedMidpoint = true;}
+            if(progress >= 1){
+                passedMidpoint = true;
+                startTime = getCurrentTime();
+                needToWait = false;
+            }
             invalidate();
         }
     }

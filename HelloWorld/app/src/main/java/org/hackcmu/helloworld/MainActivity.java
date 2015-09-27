@@ -1,18 +1,28 @@
 package org.hackcmu.helloworld;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.graphics.Path;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.animation.AccelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -61,8 +71,13 @@ public class MainActivity extends AppCompatActivity {
     private long LastSync;
 
     private FloatingActionButton mapButton;
+    private FloatingActionButton menuButton;
 
-    public CityPlans mCityPlans;
+    private CardView card;
+    private float cardOldX;
+    private float cardOldY;
+
+    public static CityPlans mCityPlans;
 
     // for number animation
     private static final int FRAME_TIME_MS = 1;
@@ -91,6 +106,16 @@ public class MainActivity extends AppCompatActivity {
 
         initialize();
 
+        RelativeLayout main = (RelativeLayout) findViewById(R.id.main_frame);
+        main.setPadding(0, getStatusBarHeight(), 0, 0);
+
+        main.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideCard();
+            }
+        });
+
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         int defaultTotalSteps = 0;
         addToStepCount(sharedPref.getInt(getString(R.string.saved_total_steps), defaultTotalSteps));
@@ -113,7 +138,143 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        card = (CardView) findViewById(R.id.main_card);
+
+        menuButton = (FloatingActionButton) findViewById(R.id.FAB_menu);
+        menuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCard();
+            }
+        });
+
         buildFitnessClient();
+
+        FrameLayout backdoor = (FrameLayout) findViewById(R.id.backdoor);
+        backdoor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(getTotalSteps() > 15000) {
+                    totalSteps = 3000;
+                    setupCurrentCity();
+                }
+                addToStepCount(3000);
+            }
+        });
+    }
+
+    private void hideCard() {
+        if(card.getVisibility() == View.VISIBLE) {
+            // get the center for the clipping circle
+            int cx = 20;
+            int cy = card.getHeight() - 20;
+
+            // get the initial radius for the clipping circle
+            int initialRadius = card.getWidth();
+
+            // create the animation (the final radius is zero)
+            Animator anim =
+                    ViewAnimationUtils.createCircularReveal(card, cx, cy, initialRadius, 0);
+            anim.setDuration(180);
+
+            float x1 = menuButton.getX();
+            float y1 = menuButton.getY();
+
+            //ending x co-ordinates
+            float x3 = cardOldX;
+            float y3 = cardOldY;
+
+            final Path path = new Path();
+            path.moveTo(x1, y1);
+
+            final float x2 = (x1 + x3) / 2;
+            final float y2 = y3;
+
+            path.quadTo(x2, y2, x3, y3);
+
+            final ObjectAnimator fabAnimator = ObjectAnimator.ofFloat(menuButton, View.X, View.Y, path);
+            fabAnimator.setInterpolator(new AccelerateInterpolator());
+            fabAnimator.setDuration(130);
+            fabAnimator.setStartDelay(180);
+
+            AnimatorSet as = new AnimatorSet();
+            as.playTogether(fabAnimator, anim);
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    card.setVisibility(View.INVISIBLE);
+                }
+            });
+
+            fabAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    menuButton.setVisibility(View.VISIBLE);
+                }
+            });
+
+            // make the view visible and start the animation
+            as.start();
+        }
+    }
+
+    private void showCard() {
+        if(card.getVisibility() == View.INVISIBLE) {
+            // get the center for the clipping circle
+            int cx = 20;
+            int cy = card.getHeight() - 20;
+
+            // get the final radius for the clipping circle
+            int finalRadius = Math.max(card.getWidth(), card.getHeight());
+
+            // create the animator for this view (the start radius is zero)
+            Animator anim =
+                    ViewAnimationUtils.createCircularReveal(card, cx, cy, 0, finalRadius);
+            anim.setDuration(180);
+            anim.setStartDelay(130);
+
+            float x1 = menuButton.getX();
+            float y1 = menuButton.getY();
+            cardOldX = x1;
+            cardOldY = y1;
+
+            //ending x co-ordinates
+            float x3 = card.getX() + 30;
+            float y3 = card.getY() + card.getHeight() - menuButton.getHeight() - 35;
+
+            final Path path = new Path();
+            path.moveTo(x1, y1);
+
+            final float x2 = (x1 + x3) / 2;
+            final float y2 = y1;
+
+            path.quadTo(x2, y2, x3, y3);
+
+            final ObjectAnimator fabAnimator = ObjectAnimator.ofFloat(menuButton, View.X, View.Y, path);
+            fabAnimator.setInterpolator(new AccelerateInterpolator());
+            fabAnimator.setDuration(200);
+
+            AnimatorSet as = new AnimatorSet();
+            as.playTogether(fabAnimator, anim);
+
+            fabAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    menuButton.setVisibility(View.INVISIBLE);
+                }
+            });
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    card.setVisibility(View.VISIBLE);
+                }
+            });
+
+            // make the view visible and start the animation
+            as.start();
+        }
     }
 
     @Override
@@ -399,11 +560,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupCurrentCity() {
+        Typeface myTypeface = Typeface.createFromAsset(getAssets(), "karla_bold.ttf");
         mCityPlans = new CityPlans(getTotalSteps());
+//        mCityPlans = new CityPlans(12000);
         TextView cityname_text = (TextView) findViewById(R.id.main_cityname);
         cityname_text.setText(getResources().getString(mCityPlans.getCurrentCityName()));
+        cityname_text.setTextColor(getResources().getColor(mCityPlans.getCurrentSecColor()));
+        cityname_text.setTypeface(myTypeface);
+
         RelativeLayout main = (RelativeLayout) findViewById(R.id.main_frame);
         main.setBackground(getResources().getDrawable(mCityPlans.getCurrentBgImage()));
+
+        TextView step_count = (TextView) findViewById(R.id.stepnumber);
+        step_count.setTextColor(getResources().getColor(mCityPlans.getCurrentPrimColor()));
+        step_count.setTypeface(myTypeface);
+
+        TextView step_count_label = (TextView) findViewById(R.id.stepnumber_label);
+        step_count_label.setTextColor(getResources().getColor(mCityPlans.getCurrentPrimColor()));
+        step_count_label.setTypeface(myTypeface);
     }
 }
 

@@ -18,4 +18,6 @@
 
     <!-- Places -->
     <string name="places_arctic_ocean">Arctic Ocean</string>
+    <string name="places_norway">Oslo,\nNorway</string>
+    <string name="places_london">London,\nEngland</string>
 </resources>
